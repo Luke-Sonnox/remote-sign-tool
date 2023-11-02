@@ -57,6 +57,7 @@ jobs:
 
     env:
       Solution_Name: RemoteSignTool/RemoteSignTool.sln
+      Configuration: ${{ matrix.configuration }}
 
     steps:
     - name: Checkout
@@ -71,8 +72,10 @@ jobs:
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+
+    # Build!
+    - name: Build the Client
+      run: msbuild RemoteSignTool/RemoteSignTool.Client/RemoteSignTool.Client.csproj -t:rebuild -property:Configuration=$env:Configuration
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
@@ -80,5 +83,3 @@ jobs:
       with:
         name: Built Resources
         path: ${{ env.Wap_Project_Directory }}/RemoteSignTool/RemoteSignTool.Client/bin/$env:Configuration/
-      env:
-        Configuration: ${{ matrix.configuration }}
